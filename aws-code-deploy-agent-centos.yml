@@ -1,0 +1,79 @@
+#####   This playbook for installing aws code deploy agent only Amazon Linux machine
+---
+- hosts: test
+  become: yes
+  vars_prompt:
+
+    - name: ---------> [ Open this link and choice the Resource kit bucket names by Region Click this [ https://docs.aws.amazon.com/codedeploy/latest/userguide/resource-kit.html#resource-kit-bucket-names ] ]
+
+    - name: EnterBucketName 
+      prompt: "Enter Bucket Name"
+      private: no
+
+    - name: EnterRegionIentifier 
+      prompt: "Enter Region Ientifier"
+      private: no
+
+  tasks:
+
+    - debug:
+        msg: "Starting Installing AWS Code Deploy Agents on {{inventory_hostname}}"
+
+    - name: Update all packages
+      yum:
+        name: "*"
+        state: latest
+
+    - name: Install Ruby
+      yum:
+        name:
+          - ruby
+        state: latest
+
+    - name: installed ruby version
+      shell: ruby --version
+      register: ruby_version
+
+    - debug:
+        msg: "{{ ruby_version.stdout }}"
+
+    - name: Install Wget
+      yum:
+        name:
+          - wget        
+        state: latest
+
+    - name: Download Codedeploy agent
+      shell: |
+        cd /opt 
+        wget https://{{ EnterBucketName }}.s3.{{ EnterRegionIentifier }}.amazonaws.com/latest/install
+        cd ~
+
+    - name: Installing Codedeploy Agent
+      shell: |
+        cd /opt
+        chmod +x ./install
+        sudo ./install auto
+        cd ~
+
+    - name: Start AWS CodeDeploy Agent
+      shell: sudo service codedeploy-agent start
+      register: codedeploy_agent_status
+
+    - debug: 
+        msg: "{{ codedeploy_agent_status.stdout_lines }}"
+
+    - name: Systemcl status codedeploy-agent
+      shell: sudo systemctl status codedeploy-agent.service
+      register: systemctl_codedeploy_agent
+      
+    - debug:
+        msg: "{{ systemctl_codedeploy_agent.stdout_lines }}"
+    
+
+
+
+
+
+
+

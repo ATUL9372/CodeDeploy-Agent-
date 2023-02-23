@@ -1,0 +1,11 @@
+[test]
+# Enter servers ip's
+
+192.168.X.X
+
+
+[test:vars]
+ansible_connection=ssh
+ansible_ssh_user=ec2-user
+#ansible_ssh_pass=u20
+#ansible_ssh_common_args='-o IdentitiesOnly=yes'
